@@ -9,6 +9,13 @@ public class PlayerController : MonoBehaviour
     public float rotationsPerSecond = 360f;
     public CinemachineVirtualCameraBase playerCamera;
 
+    public float jumpForce = 100f;
+    public float lowJumpMultiplier = 1.5f;
+    public float dropMultiplier = 2f;
+    public float doubleJumpImpulseMultiplier = 0.5f;
+
+    bool isOnGround = true;
+    bool hasDoubleJumped = false;
 
     Rigidbody rb;
 
@@ -20,6 +27,7 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Movement();
+        Jump();
     }
 
     void Movement()
@@ -41,13 +49,81 @@ public class PlayerController : MonoBehaviour
             RotateTowards(camRotation * desiredMovement);
 
             // Only apply movement if we are looking in the right direction
-            if(Vector3.Dot(desiredMovement,rb.transform.forward) > 0f)
+            if (Vector3.Dot(desiredMovement, rb.transform.forward) > 0f)
                 rb.AddForce(desiredMovement * moveSpeed * Time.deltaTime);
         }
     }
 
     void RotateTowards(Vector3 forward)
     {        
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(forward), rotationsPerSecond * Time.deltaTime);
+        rb.transform.rotation = Quaternion.RotateTowards(rb.transform.rotation, Quaternion.LookRotation(forward), rotationsPerSecond * Time.deltaTime);
+    }
+
+    // Used to treat get axis as a down function
+    bool jumpWasPressed = false;
+
+    void Jump()
+    {
+        // Handle whether jumping was pressed
+        bool jumping = (Input.GetAxisRaw("Jump") == 1);
+        bool jumpDown = !jumpWasPressed && jumping;
+        jumpWasPressed = jumping;
+
+        if(isOnGround)
+        {
+            hasDoubleJumped = false;
+
+            if (jumpDown)
+            {
+                rb.AddForce(rb.transform.up * jumpForce, ForceMode.Impulse);
+            }
+        }
+        // Is in air
+        else
+        {
+            // When in low jump (going up)
+            if(rb.velocity.y > 0f)
+            {
+                if(jumpDown && !hasDoubleJumped)
+                {
+                    rb.AddForce(rb.transform.up * jumpForce * doubleJumpImpulseMultiplier, ForceMode.Impulse);
+                    hasDoubleJumped = true;
+                }   
+                if(jumping)
+                {
+                    rb.AddForce(-Physics.gravity * lowJumpMultiplier * Time.deltaTime);
+                }
+            }
+            // When dropping    
+            else
+            {
+                rb.AddForce(Physics.gravity * dropMultiplier * Time.deltaTime);
+            }
+        }
+    }
+
+    void OnCollisionStay(Collision other)
+    {
+        foreach(ContactPoint point in other.contacts)
+        {
+            // TODO: When implementing walljump, we want to change this probably
+            if(Vector3.Dot(Vector3.up,point.normal) > 0.5f)
+            {
+                isOnGround = true;
+                return;
+            }
+        }
+    }
+
+    void OnCollisionExit(Collision other)
+    {
+        foreach (ContactPoint point in other.contacts)
+        {
+            if (Vector3.Dot(Vector3.up, point.normal) > 0.5f)
+            {
+                isOnGround = false;
+                return;
+            }
+        }
     }
 }

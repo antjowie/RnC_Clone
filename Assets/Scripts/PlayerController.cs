@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
@@ -35,22 +36,25 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxisRaw("Horizontal");
         float y = Input.GetAxisRaw("Vertical");
 
-        Vector3 desiredMovement = Vector3.Normalize(new Vector3(x, 0, y));
+        Vector3 input = Vector3.Normalize(new Vector3(x, 0, y));
 
-        if(desiredMovement != Vector3.zero)
+        if(input != Vector3.zero)
         {
             // Get camera rotation
-            var desiredForward = playerCamera.LookAt.position - playerCamera.transform.position;
-            desiredForward.y = 0;
-            desiredForward.Normalize();
-            Quaternion camRotation = Quaternion.LookRotation(desiredForward);
+            var camForward = playerCamera.LookAt.position - playerCamera.transform.position;
+            camForward.y = 0;
+            camForward.Normalize();
+            Quaternion camRotation = Quaternion.LookRotation(camForward);
 
             // Calculate the target rotation of the character
-            RotateTowards(camRotation * desiredMovement);
+            var desiredForward = camRotation * input;
+            RotateTowards(desiredForward);
 
             // Only apply movement if we are looking in the right direction
-            if (Vector3.Dot(desiredMovement, rb.transform.forward) > 0f)
-                rb.AddForce(desiredMovement * moveSpeed * Time.deltaTime);
+            if (Vector3.Dot(desiredForward, rb.transform.forward) > 0f)
+            {
+                rb.AddForce(rb.transform.forward * moveSpeed * Time.deltaTime);
+            }
         }
     }
 

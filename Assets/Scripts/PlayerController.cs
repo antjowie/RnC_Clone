@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 100;
+    public float moveSpeed = 2000f;
+    public float rotationsPerSecond = 360f;
     public CinemachineVirtualCameraBase playerCamera;
+
 
     Rigidbody rb;
 
@@ -17,19 +19,35 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        Movement();
+    }
+
+    void Movement()
+    {
         float x = Input.GetAxisRaw("Horizontal");
         float y = Input.GetAxisRaw("Vertical");
 
-        // Calculate intended movement via the player view direction
-        var forward = playerCamera.LookAt.position - playerCamera.transform.position;
-        forward.y = 0;
-        forward.Normalize();
-        var right = Vector3.Cross(transform.up, forward);
+        Vector3 desiredMovement = Vector3.Normalize(new Vector3(x, 0, y));
 
-        rb.AddForce(forward * y * moveSpeed * Time.deltaTime);
-        rb.AddForce(right * x * moveSpeed * Time.deltaTime);
+        if(desiredMovement != Vector3.zero)
+        {
+            // Get camera rotation
+            var desiredForward = playerCamera.LookAt.position - playerCamera.transform.position;
+            desiredForward.y = 0;
+            desiredForward.Normalize();
+            Quaternion camRotation = Quaternion.LookRotation(desiredForward);
 
-        // Should be force based
-        //rb.MovePosition(rb.transform.position + new Vector3(x, 0, y) * Time.deltaTime * moveSpeed);
+            // Calculate the target rotation of the character
+            RotateTowards(camRotation * desiredMovement);
+
+            // Only apply movement if we are looking in the right direction
+            if(Vector3.Dot(desiredMovement,rb.transform.forward) > 0f)
+                rb.AddForce(desiredMovement * moveSpeed * Time.deltaTime);
+        }
+    }
+
+    void RotateTowards(Vector3 forward)
+    {        
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(forward), rotationsPerSecond * Time.deltaTime);
     }
 }

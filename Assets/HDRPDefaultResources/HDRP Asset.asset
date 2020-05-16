@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0cf1dab834d4ec34195b920ea7bbf9ec, type: 3}
-  m_Name: HDRenderPipelineAsset
+  m_Name: HDRP Asset
   m_EditorClassIdentifier: 
   m_Version: 14
   m_ObsoleteFrameSettings:
@@ -315,7 +315,7 @@ MonoBehaviour:
       ChromaticAberrationMaxSamples: 03000000060000000c000000
     lightSettings:
       useContactShadow:
-        m_Values: 
+        m_Values: 000000
         m_SchemaId:
           m_Id: 
     maximumLODLevel:
@@ -344,8 +344,8 @@ MonoBehaviour:
   m_DefaultMaterialQualityLevel: 4
   diffusionProfileSettings: {fileID: 0}
   diffusionProfileSettingsList:
-  - {fileID: 11400000, guid: 56340903e83dd624094616ab0d3066a4, type: 2}
-  - {fileID: 11400000, guid: 298623861845b2e458f5c0352bb83850, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   beforeTransparentCustomPostProcesses: []
   beforePostProcessCustomPostProcesses: []
   afterPostProcessCustomPostProcesses: []

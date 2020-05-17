@@ -25,10 +25,12 @@ public class PlayerController : MonoBehaviour
     {
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
+
+        anim.SetFloat("Horizontal", input.x, moveDampTime, Time.deltaTime);
+        anim.SetFloat("Vertical", input.y, moveDampTime, Time.deltaTime);
         input.Normalize();
 
         cameraPoint.transform.position = rb.transform.position;
-        anim.SetFloat("Speed", input.magnitude, moveDampTime, Time.deltaTime);
 
         Rotate();
     }

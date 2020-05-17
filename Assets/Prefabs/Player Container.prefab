@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6919371972411692948}
-  - component: {fileID: 6919371972411692955}
   m_Layer: 0
   m_Name: Cam Target
   m_TagString: Untagged
@@ -31,20 +30,6 @@ Transform:
   m_Father: {fileID: 6919371973500348912}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6919371972411692955
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6919371972411692949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65997846fcc9ac64a8c667f140b10e85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  follow: {fileID: 6919371973722943988}
-  movespeed: 100
 --- !u!1 &6919371972854402229
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,8 +238,8 @@ MonoBehaviour:
     Value: 0.5
     m_SpeedMode: 0
     m_MaxSpeed: 2
-    m_AccelTime: 0.2
-    m_DecelTime: 0.1
+    m_AccelTime: 0.001
+    m_DecelTime: 0.001
     m_InputAxisName: Mouse Y
     m_InputAxisValue: 0
     m_InvertInput: 1
@@ -277,8 +262,8 @@ MonoBehaviour:
     Value: 0.02017212
     m_SpeedMode: 0
     m_MaxSpeed: 300
-    m_AccelTime: 0.1
-    m_DecelTime: 0.1
+    m_AccelTime: 0.001
+    m_DecelTime: 0.001
     m_InputAxisName: Mouse X
     m_InputAxisValue: 0
     m_InvertInput: 0
@@ -5405,7 +5390,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973688975198}
-  m_LocalRotation: {x: 0.16308194, y: 0.00017369728, z: -0.000028711273, w: 0.98661256}
+  m_LocalRotation: {x: 0.16308194, y: 0.00017365931, z: -0.000028704986, w: 0.98661256}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5569,8 +5554,8 @@ Rigidbody:
   m_GameObject: {fileID: 6919371973722943985}
   serializedVersion: 2
   m_Mass: 20
-  m_Drag: 5
-  m_AngularDrag: 0.05
+  m_Drag: 0
+  m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -5588,13 +5573,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b6be23200b2ca4797e1ae0b42ececf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 20000
-  rotationsPerSecond: 360
+  cameraPoint: {fileID: 6919371972411692948}
   playerCamera: {fileID: 6919371973000370102}
-  jumpForce: 200
-  lowJumpMultiplier: 1.5
-  dropMultiplier: 2
-  doubleJumpImpulseMultiplier: 0.5
+  movespeed: 1000
 --- !u!1 &6919371973749572232
 GameObject:
   m_ObjectHideFlags: 0
@@ -5619,7 +5600,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973749572232}
-  m_LocalRotation: {x: 0.14180063, y: 0.00017425616, z: -0.00002496191, w: 0.9898953}
+  m_LocalRotation: {x: 0.14180063, y: 0.00017425617, z: -0.000024961912, w: 0.9898953}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5700,7 +5681,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371974238804317}
-  m_LocalRotation: {x: 0.18100095, y: 0.00017330087, z: -0.00003276083, w: 0.98348296}
+  m_LocalRotation: {x: 0.18100095, y: 0.00017334399, z: -0.000032995074, w: 0.98348296}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -10466,8 +10447,8 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8d7119f20f5081f4b848584b1520d4dd, type: 2}
-  - {fileID: 2100000, guid: 8d7119f20f5081f4b848584b1520d4dd, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

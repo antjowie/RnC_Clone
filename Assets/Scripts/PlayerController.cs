@@ -9,21 +9,27 @@ public class PlayerController : MonoBehaviour
 
     public CinemachineVirtualCameraBase playerCamera;
     public float movespeed = 1000f;
-    
+    public float moveDampTime = 0.1f;
+
     Vector2 input;
     Rigidbody rb;
+    Animator anim;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
+        input.Normalize();
 
         cameraPoint.transform.position = rb.transform.position;
+        anim.SetFloat("Speed", input.magnitude, moveDampTime, Time.deltaTime);
+
         Rotate();
     }
 

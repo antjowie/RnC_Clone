@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Security.Permissions;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class PlayerController : MonoBehaviour
         input.Normalize();
 
         cameraPoint.transform.position = rb.transform.position;
-
+        anim.SetBool("Aiming", Input.GetMouseButton((int)MouseButton.RightMouse));
         Rotate();
     }
 

@@ -46,14 +46,14 @@ ModelImporter:
       wrapMode: 0
       orientationOffsetY: -45
       level: 0
-      cycleOffset: 0
+      cycleOffset: 0.5
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 1
       loopBlendOrientation: 1
       loopBlendPositionY: 1
-      loopBlendPositionXZ: 0
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0

@@ -1,6 +1,5 @@
 ﻿using Cinemachine;
-using System.Security.Cryptography;
-using System.Security.Permissions;
+using Cinemachine.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,9 +11,10 @@ public class PlayerController : MonoBehaviour
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
 
+    public float gravityModifier = 3f;
     public float jumpForce = 10f;
-    //public float lowJumpModifier = 1.5f;
-    //public float fallingModifier = 2f;
+    public float lowJumpModifier = 1.5f;
+    public float fallingModifier = 2f;
 
     Vector2 input;
     bool jumpingPressed = false;
@@ -36,8 +36,8 @@ public class PlayerController : MonoBehaviour
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
 
-        anim.SetFloat("Horizontal", input.x, moveDampTime, Time.deltaTime);
-        anim.SetFloat("Vertical", input.y, moveDampTime, Time.deltaTime);
+        //anim.SetFloat("Horizontal", input.x, moveDampTime, Time.deltaTime);
+        //anim.SetFloat("Vertical", input.y, moveDampTime, Time.deltaTime);
         input.Normalize();
 
         // Calculate if player pressed jump once
@@ -47,22 +47,50 @@ public class PlayerController : MonoBehaviour
         if (jumpingPressed && !oldState)
             jumpingDown = true;
 
-        Jump();
+        OnJump();
 
         cameraPoint.transform.position = rb.transform.position;
         anim.SetBool("Aiming", Input.GetMouseButton((int)MouseButton.RightMouse));
         Rotate();
+
+        // We want to know the actual executed movement for the animations so we inverse the rotation
+        var moveDir = rb.velocity;
+        moveDir.y = 0; moveDir.Normalize(); moveDir = Quaternion.Inverse(rb.rotation) * moveDir;
+        moveDir.Scale(new Vector3(input.x, 0, input.y).Abs()); // We scale animation with out input
+        anim.SetFloat("Horizontal", moveDir.x, moveDampTime, Time.deltaTime);
+        anim.SetFloat("Vertical", moveDir.z, moveDampTime, Time.deltaTime);
     }
 
     private void FixedUpdate()
     {
         Movement();
+        Jumping();
     }
 
-    void Jump()
+    void OnJump()
     {
         if(jumpingDown && onGround)
             rb.AddForce(rb.transform.up * jumpForce, ForceMode.VelocityChange);
+    }
+
+    void Jumping()
+    {
+        rb.AddForce(Physics.gravity * (gravityModifier -1f) * Time.deltaTime);
+
+        // Modify the gravity based on player state
+        if(!onGround)
+        {
+            bool falling = rb.velocity.y < 0f;
+            if(!falling)
+            {
+                if (!jumpingPressed)
+                    rb.AddForce(Physics.gravity * (lowJumpModifier - 1f) * Time.deltaTime);
+            }
+            else
+            {
+                rb.AddForce(Physics.gravity * (fallingModifier - 1f) * Time.deltaTime);
+            }
+        }
     }
 
     void Rotate()

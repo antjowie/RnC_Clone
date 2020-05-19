@@ -50,8 +50,15 @@ public class PlayerController : MonoBehaviour
 
         OnJump();
 
+
+        // TODO: Only change Y if player is falling/going up
+        //var planePos = rb.transform.position;
+        //planePos.y = cameraPoint.transform.position.y;
+        //cameraPoint.transform.position = planePos;
         cameraPoint.transform.position = rb.transform.position;
+
         anim.SetBool("Aiming", Input.GetMouseButton((int)MouseButton.RightMouse));
+        anim.SetBool("OnGround", onGround);
         Rotate();
 
         // We want to know the actual executed movement for the animations so we inverse the rotation
@@ -71,8 +78,10 @@ public class PlayerController : MonoBehaviour
     void OnJump()
     {
         if(jumpingDown && onGround)
+        {
             //https://www.youtube.com/watch?v=v1V3T5BPd7E&list=PLFt_AvWsXl0eMryeweK7gc9T04lJCIg_W
             yVelocity = Mathf.Sqrt(-2 * gravity * jumpHeigth);
+        }
     }
 
     void UpdateGravity()

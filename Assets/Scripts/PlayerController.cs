@@ -63,7 +63,10 @@ public class PlayerController : MonoBehaviour
 
         // We want to know the actual executed movement for the animations so we inverse the rotation
         var moveDir = rb.velocity;
-        moveDir.y = 0; moveDir.Normalize(); moveDir = Quaternion.Inverse(rb.rotation) * moveDir;
+        moveDir.y = 0; 
+        moveDir = Quaternion.Inverse(rb.rotation) * moveDir;
+        moveDir.x = Mathf.Clamp(moveDir.x, -1, 1);
+        moveDir.z = Mathf.Clamp(moveDir.z, -1, 1);
         moveDir.Scale(new Vector3(input.x, 0, input.y).Abs()); // We scale animation with out input
         anim.SetFloat("Horizontal", moveDir.x, moveDampTime, Time.deltaTime);
         anim.SetFloat("Vertical", moveDir.z, moveDampTime, Time.deltaTime);

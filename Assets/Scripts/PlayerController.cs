@@ -12,7 +12,14 @@ public class PlayerController : MonoBehaviour
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
 
+    public float jumpForce = 10f;
+    //public float lowJumpModifier = 1.5f;
+    //public float fallingModifier = 2f;
+
     Vector2 input;
+    bool jumpingPressed = false;
+    bool jumpingDown = false;
+
     Rigidbody rb;
     Animator anim;
 
@@ -24,12 +31,22 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // Calculate movement input
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
 
         anim.SetFloat("Horizontal", input.x, moveDampTime, Time.deltaTime);
         anim.SetFloat("Vertical", input.y, moveDampTime, Time.deltaTime);
         input.Normalize();
+
+        // Calculate if player pressed jump once
+        bool oldState = jumpingPressed;
+        jumpingDown = false;
+        jumpingPressed = Input.GetAxisRaw("Jump") == 1;
+        if (jumpingPressed && !oldState)
+            jumpingDown = true;
+
+        Jump();
 
         cameraPoint.transform.position = rb.transform.position;
         anim.SetBool("Aiming", Input.GetMouseButton((int)MouseButton.RightMouse));
@@ -39,6 +56,12 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Movement();
+    }
+
+    void Jump()
+    {
+        if(jumpingDown)
+            rb.AddForce(rb.transform.up * jumpForce, ForceMode.VelocityChange);
     }
 
     void Rotate()
@@ -52,6 +75,8 @@ public class PlayerController : MonoBehaviour
 
     void Movement()
     {
+        float oldY = rb.velocity.y;
         rb.velocity = rb.rotation * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
+        rb.velocity = rb.velocity + new Vector3(0, oldY, 0);
     }
 }

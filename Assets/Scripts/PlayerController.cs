@@ -1,5 +1,6 @@
 ﻿using Cinemachine;
 using Cinemachine.Utility;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,10 +18,15 @@ public class PlayerController : MonoBehaviour
     public float fallingModifier = 2f;
 
     Vector2 input;
+    Vector3 forceOffset;
+
     float yVelocity = 0f;
     bool jumpingPressed = false;
     bool jumpingDown = false;
-    bool onGround = false;
+
+    [Header("Inpsectables")]
+    public bool onGround = false;
+    public bool onWall = false;
 
     Rigidbody rb;
     Animator anim;
@@ -148,10 +154,15 @@ public class PlayerController : MonoBehaviour
         
         foreach (var contact in contacts)
         {
-            if(Vector3.Dot(contact.normal,rb.transform.up) > 0.5f)
+            float dot = Vector3.Dot(contact.normal, rb.transform.up);
+            if (dot > 0.5f)
             {
                 onGround = true;
-                return;
+            }
+
+            if(dot > -0.1f && dot < 0.1f)
+            {
+                onWall = true;
             }
         }
 
@@ -161,6 +172,7 @@ public class PlayerController : MonoBehaviour
     {
         // OnCollisionExit does not contain normal data
         onGround = false;
+        onWall = false;
 
         //var contacts = new ContactPoint[collision.contactCount];
         //collision.GetContacts(contacts);

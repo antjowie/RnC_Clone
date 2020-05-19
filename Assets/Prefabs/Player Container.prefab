@@ -5391,7 +5391,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973688975198}
-  m_LocalRotation: {x: 0.16308194, y: 0.00017369728, z: -0.000028711262, w: 0.98661256}
+  m_LocalRotation: {x: 0.16308194, y: 0.00017365931, z: -0.000028704986, w: 0.98661256}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5578,8 +5578,8 @@ MonoBehaviour:
   playerCamera: {fileID: 6919371973000370102}
   movespeed: 1000
   moveDampTime: 0.1
-  gravityModifier: 3
-  jumpForce: 100
+  gravity: -20
+  jumpHeigth: 10
   lowJumpModifier: 1.5
   fallingModifier: 2
 --- !u!1 &6919371973749572232
@@ -5687,7 +5687,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371974238804317}
-  m_LocalRotation: {x: 0.18100093, y: 0.00017332884, z: -0.000033001626, w: 0.98348296}
+  m_LocalRotation: {x: 0.18100095, y: 0.00017334663, z: -0.000033009506, w: 0.98348296}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -10539,7 +10539,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7950299696633321724}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 4bc78acb0eb60c440b3fc35614105527, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.66
@@ -10557,7 +10557,7 @@ Rigidbody:
   m_Mass: 1.5
   m_Drag: 0
   m_AngularDrag: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112
@@ -10578,10 +10578,10 @@ MonoBehaviour:
   playerCamera: {fileID: 6919371973000370102}
   movespeed: 1000
   moveDampTime: 0.1
-  gravityModifier: 3
-  jumpForce: 10
-  lowJumpModifier: 1.5
-  fallingModifier: 100
+  gravity: -60
+  jumpHeigth: 10
+  lowJumpModifier: 3
+  fallingModifier: 2
 --- !u!1001 &6919371972459928812
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -11,12 +11,13 @@ public class PlayerController : MonoBehaviour
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
 
-    public float gravityModifier = 3f;
-    public float jumpForce = 10f;
+    public float gravity = -20f;
+    public float jumpHeigth = 10f;
     public float lowJumpModifier = 1.5f;
     public float fallingModifier = 2f;
 
     Vector2 input;
+    float yVelocity = 0f;
     bool jumpingPressed = false;
     bool jumpingDown = false;
     bool onGround = false;
@@ -63,33 +64,42 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        UpdateGravity();
         Movement();
-        Jumping();
     }
 
     void OnJump()
     {
         if(jumpingDown && onGround)
-            rb.AddForce(rb.transform.up * jumpForce, ForceMode.VelocityChange);
+            //https://www.youtube.com/watch?v=v1V3T5BPd7E&list=PLFt_AvWsXl0eMryeweK7gc9T04lJCIg_W
+            yVelocity = Mathf.Sqrt(-2 * gravity * jumpHeigth);
     }
 
-    void Jumping()
+    void UpdateGravity()
     {
-        rb.AddForce(Physics.gravity * (gravityModifier -1f) * Time.deltaTime);
+        yVelocity += gravity * Time.deltaTime;
 
         // Modify the gravity based on player state
-        if(!onGround)
+        if (!onGround)
         {
-            bool falling = rb.velocity.y < 0f;
+            bool falling = yVelocity < 0f;
+
             if(!falling)
             {
                 if (!jumpingPressed)
-                    rb.AddForce(Physics.gravity * (lowJumpModifier - 1f) * Time.deltaTime);
+                    yVelocity += gravity * (lowJumpModifier - 1f) * Time.deltaTime;
             }
             else
             {
-                rb.AddForce(Physics.gravity * (fallingModifier - 1f) * Time.deltaTime);
+                yVelocity += gravity * (fallingModifier - 1f) * Time.deltaTime;
             }
+        }
+        else
+        {
+            // Make the player fall to the ground constantly to ensure correct behavior
+            // TODO: Verify if this doesn't break slopes
+            if(yVelocity < 0f)
+                yVelocity = -0.1f;
         }
     }
 
@@ -104,9 +114,8 @@ public class PlayerController : MonoBehaviour
 
     void Movement()
     {
-        float oldY = rb.velocity.y;
         rb.velocity = rb.rotation * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
-        rb.velocity = rb.velocity + new Vector3(0, oldY, 0);
+        rb.velocity = new Vector3(rb.velocity.x, yVelocity, rb.velocity.z);
     }
 
     void OnCollisionEnter(Collision collision)

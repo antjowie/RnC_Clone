@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     Vector2 input;
     bool jumpingPressed = false;
     bool jumpingDown = false;
+    bool onGround = false;
 
     Rigidbody rb;
     Animator anim;
@@ -60,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        if(jumpingDown)
+        if(jumpingDown && onGround)
             rb.AddForce(rb.transform.up * jumpForce, ForceMode.VelocityChange);
     }
 
@@ -79,4 +80,45 @@ public class PlayerController : MonoBehaviour
         rb.velocity = rb.rotation * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
         rb.velocity = rb.velocity + new Vector3(0, oldY, 0);
     }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        //var contacts = new ContactPoint[collision.contactCount];
+        //collision.GetContacts(contacts);
+        //
+        //foreach (var contact in contacts)
+        //{
+        //    Debug.DrawRay(contact.point, contact.normal * 10f, Color.red);
+        //}
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        var contacts = new ContactPoint[collision.contactCount];
+        collision.GetContacts(contacts);
+        
+        foreach (var contact in contacts)
+        {
+            if(Vector3.Dot(contact.normal,rb.transform.up) > 0.5f)
+            {
+                onGround = true;
+                return;
+            }
+        }
+
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        // OnCollisionExit does not contain normal data
+        onGround = false;
+
+        //var contacts = new ContactPoint[collision.contactCount];
+        //collision.GetContacts(contacts);
+        //foreach (var contact in contacts)
+        //{
+        //    Debug.DrawRay(contact.point, contact.normal * 10f, Color.blue,5f);
+        //}
+    }
+
 }

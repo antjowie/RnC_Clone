@@ -18,11 +18,15 @@ public class PlayerController : MonoBehaviour
     public float fallingModifier = 2f;
 
     Vector2 input;
-    Vector3 forceOffset;
 
     float yVelocity = 0f;
     bool jumpingPressed = false;
     bool jumpingDown = false;
+
+    [Header("Walljump")]
+    public Vector2 wallJumpForce = new Vector2(100f,200f);
+    public float wallJumpForceDuration = 0.5f;
+    Vector3 lastWallNormal;
 
     [Header("Inpsectables")]
     public bool onGround = true;
@@ -30,6 +34,17 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
     Animator anim;
+
+    Vector3 forceOffset;
+    float forceCancelTime;
+    float forceCancelTimer;
+
+    public void ApplyForce(Vector3 force, float cancelTime)
+    {
+        forceOffset = force;
+        forceCancelTime = 0;
+        forceCancelTimer = cancelTime;
+    }
 
     private void Awake()
     {
@@ -54,8 +69,10 @@ public class PlayerController : MonoBehaviour
         if (jumpingPressed && !oldState)
             jumpingDown = true;
 
-        OnJump();
+        if (jumpingDown)
+            OnJump();
 
+        //ApplyForce(new Vector3(2000, 0, 0), 3);
 
         // TODO: Only change Y if player is falling/going up
         //var planePos = rb.transform.position;
@@ -82,6 +99,19 @@ public class PlayerController : MonoBehaviour
     {
         UpdateGravity();
         Movement();
+
+        if(forceCancelTime < forceCancelTimer)
+        {
+            forceCancelTime += Time.deltaTime;
+            Vector3 force = forceOffset * (1f - forceCancelTime / forceCancelTimer);
+
+            rb.velocity += force * Time.deltaTime;
+        }
+        else
+        {
+            forceOffset = Vector3.zero;
+            forceCancelTime = forceCancelTimer = 0f;
+        }
     }
 
     private void OnJump()
@@ -90,6 +120,15 @@ public class PlayerController : MonoBehaviour
         {
             //https://www.youtube.com/watch?v=v1V3T5BPd7E&list=PLFt_AvWsXl0eMryeweK7gc9T04lJCIg_W
             yVelocity = Mathf.Sqrt(-2 * gravity * jumpHeigth);
+        }
+
+        // Walljump
+        if(jumpingDown && !onGround && onWall)
+        {
+            Vector3 force = lastWallNormal * wallJumpForce.x;
+            force.y = wallJumpForce.y;
+            ApplyForce(force, wallJumpForceDuration);
+            yVelocity = 0;
         }
     }
 
@@ -162,6 +201,7 @@ public class PlayerController : MonoBehaviour
 
             if(dot > -0.1f && dot < 0.1f)
             {
+                lastWallNormal = contact.normal;
                 onWall = true;
             }
         }

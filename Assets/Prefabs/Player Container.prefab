@@ -5582,6 +5582,8 @@ MonoBehaviour:
   jumpHeigth: 10
   lowJumpModifier: 1.5
   fallingModifier: 2
+  onGround: 0
+  onWall: 0
 --- !u!1 &6919371973749572232
 GameObject:
   m_ObjectHideFlags: 0
@@ -10582,6 +10584,8 @@ MonoBehaviour:
   jumpHeigth: 10
   lowJumpModifier: 3
   fallingModifier: 2
+  onGround: 0
+  onWall: 0
 --- !u!1001 &6919371972459928812
 PrefabInstance:
   m_ObjectHideFlags: 0

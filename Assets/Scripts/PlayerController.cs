@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     bool jumpingDown = false;
 
     [Header("Inpsectables")]
-    public bool onGround = false;
+    public bool onGround = true;
     public bool onWall = false;
 
     Rigidbody rb;
@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
         Movement();
     }
 
-    void OnJump()
+    private void OnJump()
     {
         if(jumpingDown && onGround)
         {
@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void UpdateGravity()
+    private void UpdateGravity()
     {
         yVelocity += gravity * Time.deltaTime;
 
@@ -121,7 +121,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Rotate()
+    private void Rotate()
     {
         // Get new movement direction
         var moveDir = playerCamera.LookAt.position - playerCamera.transform.position;
@@ -130,13 +130,13 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(moveDir);
     }
 
-    void Movement()
+    private void Movement()
     {
         rb.velocity = rb.rotation * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
         rb.velocity = new Vector3(rb.velocity.x, yVelocity, rb.velocity.z);
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         //var contacts = new ContactPoint[collision.contactCount];
         //collision.GetContacts(contacts);
@@ -147,7 +147,7 @@ public class PlayerController : MonoBehaviour
         //}
     }
 
-    void OnCollisionStay(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
         var contacts = new ContactPoint[collision.contactCount];
         collision.GetContacts(contacts);
@@ -168,7 +168,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void OnCollisionExit(Collision collision)
+    private void OnCollisionExit(Collision collision)
     {
         // OnCollisionExit does not contain normal data
         onGround = false;

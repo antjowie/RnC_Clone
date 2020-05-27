@@ -7,51 +7,74 @@ using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Camera")]
     public Transform cameraPoint;
 
+    [Header("Movement")]
     public CinemachineVirtualCameraBase playerCamera;
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
 
+    [Header("Jumping")]
     public float gravity = -20f;
     public float jumpHeigth = 10f;
     public float lowJumpModifier = 1.5f;
     public float fallingModifier = 2f;
-
-    public GameObject weaponPrefab;
-    public Transform weaponPoint;
 
     [Header("Walljump")]
     public Vector2 wallJumpForce = new Vector2(100f,200f);
     public float wallJumpForceDuration = 0.5f;
     Vector3 lastWallNormal;
 
-    [Header("Inpsectables")]
+    [Header("Combat")]
+    public GameObject weaponPrefab;
+    public Transform weaponPoint;
+
+    [Header("READ ONLY Inpsectables")]
     public bool onGround = true;
     public bool onWall = false;
 
-    float blendTime = 0.2f;
+    // Components
+    Rigidbody rb;
+    Animator anim;
 
+    // Movement
     Vector2 input;
+    Quaternion desRot;
+    Vector3 desVel;
+    Vector3 extVel;
 
     float yVelocity = 0f;
     bool jumpingPressed = false;
     bool jumpingDown = false;
 
-    Rigidbody rb;
-    Animator anim;
-
-    Vector3 forceOffset;
-    float forceCancelTime;
-    float forceCancelTimer;
-
-    float blendWeigth = 0f;
-
-    public void ApplyForce(Vector3 force, float cancelTime)
+    struct Force
     {
-        forceOffset = force;
-        forceCancelTime = 0;
-        forceCancelTimer = cancelTime;
+        public Vector3 vel;
+        public float cancelTime;
+        public float cancelTimer;
+    }
+    Force desForce;
+    Force extForce;
+
+    // Animations
+    float blendWeigth = 0f;
+    float blendTime = 0.2f;
+
+    public void ApplyForce(Vector3 force, float cancelTime, bool desired = false)
+    {
+        if(desired)
+        {
+            desForce.vel = force;
+            desForce.cancelTime = 0;
+            desForce.cancelTimer = cancelTime;
+        }
+        else
+        {
+            extForce.vel = force;
+            extForce.cancelTime = 0;
+            extForce.cancelTimer = cancelTime;
+        }
     }
 
     private void Awake()
@@ -69,9 +92,6 @@ public class PlayerController : MonoBehaviour
         // Calculate movement input
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
-
-        //anim.SetFloat("Horizontal", input.x, moveDampTime, Time.deltaTime);
-        //anim.SetFloat("Vertical", input.y, moveDampTime, Time.deltaTime);
         input.Normalize();
 
         // Calculate if player pressed jump once
@@ -84,16 +104,20 @@ public class PlayerController : MonoBehaviour
         if (jumpingDown)
             OnJump();
 
-        //ApplyForce(new Vector3(2000, 0, 0), 3);
-
-        // TODO: Only change Y if player is falling/going up
-        //var planePos = rb.transform.position;
-        //planePos.y = cameraPoint.transform.position.y;
-        //cameraPoint.transform.position = planePos;
-        cameraPoint.transform.position = rb.transform.position;
+        // Update variables
+        {
+            // TODO: Only change Y if player is falling/going up
+            //var planePos = rb.transform.position;
+            //planePos.y = cameraPoint.transform.position.y;
+            //cameraPoint.transform.position = planePos;
+            cameraPoint.transform.position = rb.transform.position;
+            
+            var camForward = playerCamera.LookAt.position - playerCamera.transform.position;
+            camForward.y = 0; camForward.Normalize();
+            desRot = Quaternion.LookRotation(camForward);
+        }
 
         WeaponUpdate();
-        anim.SetBool("OnGround", onGround);
         Rotate();
 
         // We want to know the actual executed movement for the animations so we inverse the rotation
@@ -105,25 +129,39 @@ public class PlayerController : MonoBehaviour
         moveDir.Scale(new Vector3(input.x, 0, input.y).Abs()); // We scale animation with out input
         anim.SetFloat("Horizontal", moveDir.x, moveDampTime, Time.deltaTime);
         anim.SetFloat("Vertical", moveDir.z, moveDampTime, Time.deltaTime);
+        anim.SetBool("OnGround", onGround);
     }
+
+    // This function calculates the velocity that a force applies
+    private Vector3 UpdateForce(ref Force force)
+    {
+        if (force.cancelTime < force.cancelTimer)
+        {
+            force.cancelTime += Time.deltaTime;
+            Vector3 offset = force.vel * (1f - force.cancelTime / force.cancelTimer);
+
+            return offset * Time.deltaTime;
+        }
+        else
+        {
+            force.vel = Vector3.zero;
+            force.cancelTime = force.cancelTimer = 0f;
+        }
+        return Vector3.zero;
+    }
+
 
     private void FixedUpdate()
     {
         UpdateGravity();
-        Movement();
+        desVel = UpdateForce(ref desForce);
+        extVel = UpdateForce(ref extForce);
 
-        if(forceCancelTime < forceCancelTimer)
-        {
-            forceCancelTime += Time.deltaTime;
-            Vector3 force = forceOffset * (1f - forceCancelTime / forceCancelTimer);
+        // Apply user input to des vel
+        desVel += desRot * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
+        desVel.y += yVelocity;
 
-            rb.velocity += force * Time.deltaTime;
-        }
-        else
-        {
-            forceOffset = Vector3.zero;
-            forceCancelTime = forceCancelTimer = 0f;
-        }
+        rb.velocity = desVel + extVel;
     }
 
     private void WeaponUpdate()
@@ -190,17 +228,9 @@ public class PlayerController : MonoBehaviour
 
     private void Rotate()
     {
-        // Get new movement direction
-        var moveDir = playerCamera.LookAt.position - playerCamera.transform.position;
-        moveDir.y = 0; moveDir.Normalize();
+        // The rotation depends on the des direction as well as the intended force direction (walljumping)
+        // We should calculate the immidiate velocity
 
-        transform.rotation = Quaternion.LookRotation(moveDir);
-    }
-
-    private void Movement()
-    {
-        rb.velocity = rb.rotation * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
-        rb.velocity = new Vector3(rb.velocity.x, yVelocity, rb.velocity.z);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -249,5 +279,4 @@ public class PlayerController : MonoBehaviour
         //    Debug.DrawRay(contact.point, contact.normal * 10f, Color.blue,5f);
         //}
     }
-
 }

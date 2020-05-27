@@ -10,12 +10,13 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Camera")]
     public Transform cameraPoint;
+    public CinemachineFreeLook playerCamera;
 
     [Header("Movement")]
-    public CinemachineVirtualCameraBase playerCamera;
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
     public float rotateRate = 4f;
+    public float horizontalRotateRate = 0.15f;
 
     [Header("Jumping")]
     public float gravity = -20f;
@@ -177,6 +178,15 @@ public class PlayerController : MonoBehaviour
         desVel.y += yVelocity;
 
         rb.velocity = desVel + extVel;
+
+        // Rotate camera based on horizontal movement
+        // NOTE: This feels a bit weird, maybe not do it
+        var horizontal = input.x;// (Quaternion.Inverse(playerCamera.transform.rotation) * rb.velocity).x;
+        // This should kinda normalize it
+        horizontal = horizontal / (movespeed * Time.deltaTime);
+        horizontal *= 360f * rotateRate;
+        print(horizontal);
+        playerCamera.m_XAxis.Value += horizontal * Time.deltaTime;
     }
 
     private void UpdateWeapon()

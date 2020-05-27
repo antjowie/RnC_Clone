@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     public CinemachineVirtualCameraBase playerCamera;
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
-    public float rotateRate = 4f; 
+    public float rotateRate = 4f;
 
     [Header("Jumping")]
     public float gravity = -20f;
@@ -49,6 +49,8 @@ public class PlayerController : MonoBehaviour
     float yVelocity = 0f;
     bool jumpingPressed = false;
     bool jumpingDown = false;
+
+    bool cameraYShouldMove = false;
 
     struct Force
     {
@@ -106,18 +108,13 @@ public class PlayerController : MonoBehaviour
         if (jumpingDown)
             OnJump();
 
-        // Update variables
+        // Update camRot
         {
-            // TODO: Only change Y if player is falling/going up
-            //var planePos = rb.transform.position;
-            //planePos.y = cameraPoint.transform.position.y;
-            //cameraPoint.transform.position = planePos;
-            cameraPoint.transform.position = rb.transform.position;
-            
             var camForward = playerCamera.LookAt.position - playerCamera.transform.position;
             camForward.y = 0; camForward.Normalize();
             camRot = Quaternion.LookRotation(camForward);
         }
+
 
         if (desVel.x != 0 && desVel.y != 0)
         {
@@ -125,6 +122,7 @@ public class PlayerController : MonoBehaviour
         }
         UpdateWeapon();
         UpdateAnimation();
+        UpdateCamera();
     }
 
     void UpdateWalkingOrientation()
@@ -197,6 +195,23 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    void UpdateCamera()
+    {
+        if (transform.position.y < cameraPoint.transform.position.y)
+        {
+            cameraYShouldMove = true;
+        }
+        var camTargetPos = rb.transform.position;
+        camTargetPos.y = cameraPoint.position.y;
+
+        if (cameraYShouldMove)
+        {
+            camTargetPos.y = Mathf.Lerp(camTargetPos.y, rb.transform.position.y, Time.deltaTime * 20f);
+        }
+
+        cameraPoint.transform.position = camTargetPos;
+    }
+
     private void OnJump()
     {
         if(jumpingDown && onGround)
@@ -212,6 +227,7 @@ public class PlayerController : MonoBehaviour
             force.y = wallJumpForce.y;
             ApplyForce(force, wallJumpForceDuration,true);
             yVelocity = 0;
+            cameraYShouldMove = true;
         }
     }
 
@@ -265,6 +281,7 @@ public class PlayerController : MonoBehaviour
             if (dot > 0.5f)
             {
                 onGround = true;
+                cameraYShouldMove = true;
             }
 
             if(dot > -0.1f && dot < 0.1f)
@@ -281,6 +298,7 @@ public class PlayerController : MonoBehaviour
         // OnCollisionExit does not contain normal data
         onGround = false;
         onWall = false;
+        cameraYShouldMove = false;
 
         //var contacts = new ContactPoint[collision.contactCount];
         //collision.GetContacts(contacts);

@@ -88,7 +88,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 5.41, z: -14.2}
+  m_FollowOffset: {x: 0, y: 5.41, z: -25}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -108,7 +108,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0.02017212
+    Value: 0
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -183,7 +183,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973000370103}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0049993927, y: 7.41, z: -14.199999}
+  m_LocalPosition: {x: 0, y: 7.41, z: -25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6919371974238804259}
@@ -253,13 +253,13 @@ MonoBehaviour:
       m_LegacyHeadingDefinition: -1
       m_LegacyVelocityFilterStrength: -1
   m_YAxisRecentering:
-    m_enabled: 1
+    m_enabled: 0
     m_WaitTime: 1
     m_RecenteringTime: 2
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0.02017212
+    Value: 0
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.001
@@ -287,14 +287,14 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_BindingMode: 4
-  m_SplineCurvature: 0.2
+  m_SplineCurvature: 1
   m_Orbits:
-  - m_Height: 9.8
-    m_Radius: 6.75
+  - m_Height: 13.6
+    m_Radius: 20.58
   - m_Height: 5.41
-    m_Radius: 14.2
-  - m_Height: -0.9
-    m_Radius: 3.22
+    m_Radius: 25
+  - m_Height: -2.99
+    m_Radius: 10.23
   m_LegacyHeadingBias: 3.4028235e+38
   m_Rigs:
   - {fileID: 6919371974238804316}
@@ -312,7 +312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Offset: {x: 0, y: 2.05, z: 0}
+  m_Offset: {x: 0, y: 3.5, z: 0}
   m_ApplyAfter: 1
   m_PreserveComposition: 0
 --- !u!114 &6919371973000370107
@@ -385,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 5.41, z: -14.2}
+  m_FollowOffset: {x: 0, y: 5.41, z: -25}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -405,7 +405,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0.02017212
+    Value: 0
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -511,7 +511,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 5.41, z: -14.2}
+  m_FollowOffset: {x: 0, y: 5.41, z: -25}
   m_XDamping: 0
   m_YDamping: 0
   m_ZDamping: 0
@@ -531,7 +531,7 @@ MonoBehaviour:
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
-    Value: 0.02017212
+    Value: 0
     m_SpeedMode: 0
     m_MaxSpeed: 300
     m_AccelTime: 0.1
@@ -637,7 +637,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973688975198}
-  m_LocalRotation: {x: 0.16308194, y: 0.00017365931, z: -0.000028704986, w: 0.98661256}
+  m_LocalRotation: {x: 0.08825151, y: 0.000000017452583, z: 8.6675217e-10, w: 0.9960983}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -823,13 +823,15 @@ MonoBehaviour:
   playerCamera: {fileID: 6919371973000370102}
   movespeed: 1000
   moveDampTime: 0.1
+  rotateRate: 4
   gravity: -20
   jumpHeigth: 10
   lowJumpModifier: 1.5
   fallingModifier: 2
-  weaponPoint: {fileID: 0}
   wallJumpForce: {x: 100, y: 200}
   wallJumpForceDuration: 0.5
+  weaponPrefab: {fileID: 0}
+  weaponPoint: {fileID: 0}
   onGround: 0
   onWall: 0
 --- !u!1 &6919371973749572232
@@ -856,7 +858,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973749572232}
-  m_LocalRotation: {x: 0.14180063, y: 0.00017425616, z: -0.000024961895, w: 0.9898953}
+  m_LocalRotation: {x: 0.06806786, y: 0.00000001921663, z: -0.0000000016632821, w: 0.9976807}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -937,7 +939,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371974238804317}
-  m_LocalRotation: {x: 0.18100095, y: 0.00017335305, z: -0.000033044395, w: 0.98348296}
+  m_LocalRotation: {x: 0.10635542, y: 0.00000012386855, z: -0.0000011580601, w: 0.9943282}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1074,13 +1076,16 @@ MonoBehaviour:
   playerCamera: {fileID: 6919371973000370102}
   movespeed: 1000
   moveDampTime: 0.1
+  rotateRate: 2
   gravity: -60
-  jumpHeigth: 10
+  jumpHeigth: 4
   lowJumpModifier: 3
   fallingModifier: 2
-  weaponPoint: {fileID: 8466129610111187592}
-  wallJumpForce: {x: 1725, y: 6900}
+  wallJumpForce: {x: 2400, y: 3000}
   wallJumpForceDuration: 0.5
+  weaponPrefab: {fileID: 717432180930334250, guid: 17a4732b6d3e6774bafac478462849d5,
+    type: 3}
+  weaponPoint: {fileID: 2037081489905636407}
   onGround: 1
   onWall: 0
 --- !u!1001 &6919371973530684757
@@ -1257,9 +1262,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38b14d6630676104d841090a17c9b826, type: 3}
---- !u!4 &8466129610111187592 stripped
+--- !u!4 &2037081489905636407 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -9042772588573301732, guid: 38b14d6630676104d841090a17c9b826,
+  m_CorrespondingSourceObject: {fileID: -1461126803791000925, guid: 38b14d6630676104d841090a17c9b826,
     type: 3}
   m_PrefabInstance: {fileID: 8645823024268123796}
   m_PrefabAsset: {fileID: 0}

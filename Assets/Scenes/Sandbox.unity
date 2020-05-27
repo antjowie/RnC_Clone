@@ -1071,6 +1071,11 @@ PrefabInstance:
       propertyPath: weaponPoint
       value: 
       objectReference: {fileID: 443625779}
+    - target: {fileID: 894081353628758744, guid: ef424dd97a6398246a68ef3f63537b20,
+        type: 3}
+      propertyPath: rotateRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 991526711995904728, guid: ef424dd97a6398246a68ef3f63537b20,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1184,12 +1189,12 @@ PrefabInstance:
     - target: {fileID: 6919371974238804259, guid: ef424dd97a6398246a68ef3f63537b20,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000173331
+      value: 0.00017333143
       objectReference: {fileID: 0}
     - target: {fileID: 6919371974238804259, guid: ef424dd97a6398246a68ef3f63537b20,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.000033055567
+      value: -0.00003305782
       objectReference: {fileID: 0}
     - target: {fileID: 6919371974238804259, guid: ef424dd97a6398246a68ef3f63537b20,
         type: 3}

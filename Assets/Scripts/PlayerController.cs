@@ -1,6 +1,7 @@
 ﻿using Cinemachine;
 using Cinemachine.Utility;
 using Unity.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,11 +18,8 @@ public class PlayerController : MonoBehaviour
     public float lowJumpModifier = 1.5f;
     public float fallingModifier = 2f;
 
-    Vector2 input;
-
-    float yVelocity = 0f;
-    bool jumpingPressed = false;
-    bool jumpingDown = false;
+    public GameObject weaponPrefab;
+    public Transform weaponPoint;
 
     [Header("Walljump")]
     public Vector2 wallJumpForce = new Vector2(100f,200f);
@@ -32,12 +30,22 @@ public class PlayerController : MonoBehaviour
     public bool onGround = true;
     public bool onWall = false;
 
+    float blendTime = 0.2f;
+
+    Vector2 input;
+
+    float yVelocity = 0f;
+    bool jumpingPressed = false;
+    bool jumpingDown = false;
+
     Rigidbody rb;
     Animator anim;
 
     Vector3 forceOffset;
     float forceCancelTime;
     float forceCancelTimer;
+
+    float blendWeigth = 0f;
 
     public void ApplyForce(Vector3 force, float cancelTime)
     {
@@ -50,6 +58,10 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponentInChildren<Animator>();
+
+        weaponPrefab = Instantiate(weaponPrefab, weaponPoint);
+        weaponPrefab.transform.localPosition = Vector3.zero;
+        weaponPrefab.transform.localScale = Vector3.one;
     }
 
     private void Update()
@@ -80,7 +92,7 @@ public class PlayerController : MonoBehaviour
         //cameraPoint.transform.position = planePos;
         cameraPoint.transform.position = rb.transform.position;
 
-        anim.SetBool("Aiming", Input.GetMouseButton((int)MouseButton.RightMouse));
+        WeaponUpdate();
         anim.SetBool("OnGround", onGround);
         Rotate();
 
@@ -112,6 +124,22 @@ public class PlayerController : MonoBehaviour
             forceOffset = Vector3.zero;
             forceCancelTime = forceCancelTimer = 0f;
         }
+    }
+
+    private void WeaponUpdate()
+    {
+        if (Input.GetMouseButton((int)MouseButton.RightMouse))
+        {
+            weaponPrefab.SetActive(true);
+            blendWeigth = Mathf.Lerp(blendWeigth, 1.0f, Time.deltaTime / blendTime);
+        }
+        else
+        {
+            weaponPrefab.SetActive(false);
+            blendWeigth = Mathf.Lerp(blendWeigth, 0f, Time.deltaTime / blendTime);
+        }
+        anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), blendWeigth);
+
     }
 
     private void OnJump()

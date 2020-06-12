@@ -116,11 +116,7 @@ public class PlayerController : MonoBehaviour
             camRot = Quaternion.LookRotation(camForward);
         }
 
-
-        if (desVel.x != 0 && desVel.y != 0)
-        {
-            UpdateWalkingOrientation();
-        }
+        UpdateWalkingOrientation();
         UpdateWeapon();
         UpdateAnimation();
         UpdateCamera();
@@ -130,7 +126,14 @@ public class PlayerController : MonoBehaviour
     {
         // Update rotation
         var desMove = desVel; desMove.y = 0;
-        rb.rotation = Quaternion.RotateTowards(rb.rotation, Quaternion.LookRotation(desMove.normalized, Vector3.up), 360f * rotateRate * Time.deltaTime);
+        // We only rotate if we move
+        if (desMove != Vector3.zero)
+        {
+            rb.rotation = Quaternion.RotateTowards(
+                rb.rotation, 
+                Quaternion.LookRotation(desMove.normalized, Vector3.up), 
+                360f * rotateRate * Time.deltaTime);
+        }
     }
 
     void UpdateAnimation()
@@ -179,13 +182,12 @@ public class PlayerController : MonoBehaviour
 
         rb.velocity = desVel + extVel;
 
-        // Rotate camera based on horizontal movement
-        // NOTE: This feels a bit weird, maybe not do it
-        var horizontal = input.x;// (Quaternion.Inverse(playerCamera.transform.rotation) * rb.velocity).x;
+        // Rotate camera based on horizontal movement relative to camera
+        var horizontal = (Quaternion.Inverse(camRot) * rb.velocity).x;// (Quaternion.Inverse(playerCamera.transform.rotation) * rb.velocity).x;
         // This should kinda normalize it
         horizontal = horizontal / (movespeed * Time.deltaTime);
-        horizontal *= 360f * rotateRate;
-        print(horizontal);
+        horizontal *= 360f * horizontalRotateRate;
+
         playerCamera.m_XAxis.Value += horizontal * Time.deltaTime;
     }
 

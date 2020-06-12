@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     [Header("Walljump")]
     public Vector2 wallJumpForce = new Vector2(100f,200f);
     public float wallJumpForceDuration = 0.5f;
+    public float maxGravStep = 1f;
     Vector3 lastWallNormal;
 
     [Header("Combat")]
@@ -47,6 +48,8 @@ public class PlayerController : MonoBehaviour
     Vector3 desVel;
     Vector3 extVel;
 
+    // At the moment will only be used for player walljumping
+    public float gravityModifier = 1f;
     float yVelocity = 0f;
     bool jumpingPressed = false;
     bool jumpingDown = false;
@@ -116,11 +119,41 @@ public class PlayerController : MonoBehaviour
             camRot = Quaternion.LookRotation(camForward);
         }
 
+        // Restore gravity modifier to normal value
+        {
+            var gravStep = Mathf.Clamp(1f - gravityModifier,-maxGravStep,maxGravStep);
+            gravityModifier += (gravStep * Time.deltaTime);
+        }
+
         UpdateWalkingOrientation();
         UpdateWeapon();
         UpdateAnimation();
         UpdateCamera();
     }
+
+    private void FixedUpdate()
+    {
+        UpdateGravity();
+        desVel = UpdateForce(ref desForce);
+        extVel = UpdateForce(ref extForce);
+
+        // Apply user input to des vel
+        desVel += camRot * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
+        desVel.y += yVelocity;
+
+        // Rotate camera based on horizontal movement relative to camera
+        // We rotate it before setting the velocity since we rely on Unity physics for collisions.
+        {
+            var horizontal = (Quaternion.Inverse(camRot) * rb.velocity).x;// (Quaternion.Inverse(playerCamera.transform.rotation) * rb.velocity).x;
+            horizontal = horizontal / (movespeed * Time.deltaTime);
+            horizontal *= 360f * horizontalRotateRate;
+
+            playerCamera.m_XAxis.Value += horizontal * Time.deltaTime;
+        }
+
+        rb.velocity = desVel + extVel;
+    }
+
 
     void UpdateWalkingOrientation()
     {
@@ -169,28 +202,6 @@ public class PlayerController : MonoBehaviour
         return Vector3.zero;
     }
 
-
-    private void FixedUpdate()
-    {
-        UpdateGravity();
-        desVel = UpdateForce(ref desForce);
-        extVel = UpdateForce(ref extForce);
-
-        // Apply user input to des vel
-        desVel += camRot * new Vector3(input.x, 0, input.y) * movespeed * Time.deltaTime;
-        desVel.y += yVelocity;
-
-        rb.velocity = desVel + extVel;
-
-        // Rotate camera based on horizontal movement relative to camera
-        var horizontal = (Quaternion.Inverse(camRot) * rb.velocity).x;// (Quaternion.Inverse(playerCamera.transform.rotation) * rb.velocity).x;
-        // This should kinda normalize it
-        horizontal = horizontal / (movespeed * Time.deltaTime);
-        horizontal *= 360f * horizontalRotateRate;
-
-        playerCamera.m_XAxis.Value += horizontal * Time.deltaTime;
-    }
-
     private void UpdateWeapon()
     {
         if (Input.GetMouseButton((int)MouseButton.RightMouse))
@@ -207,6 +218,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    // Updates the camera Y pos
     void UpdateCamera()
     {
         if (transform.position.y < cameraPoint.transform.position.y)
@@ -238,6 +250,7 @@ public class PlayerController : MonoBehaviour
             Vector3 force = lastWallNormal * wallJumpForce.x;
             force.y = wallJumpForce.y;
             ApplyForce(force, wallJumpForceDuration,true);
+            gravityModifier = 0.5f;
             yVelocity = 0;
             cameraYShouldMove = true;
         }
@@ -245,7 +258,7 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateGravity()
     {
-        yVelocity += gravity * Time.deltaTime;
+        yVelocity += gravity * gravityModifier * Time.deltaTime;
 
         // Modify the gravity based on player state
         if (!onGround)
@@ -255,11 +268,11 @@ public class PlayerController : MonoBehaviour
             if(!falling)
             {
                 if (!jumpingPressed)
-                    yVelocity += gravity * (lowJumpModifier - 1f) * Time.deltaTime;
+                    yVelocity += gravity * gravityModifier * (lowJumpModifier - 1f) * Time.deltaTime;
             }
             else
             {
-                yVelocity += gravity * (fallingModifier - 1f) * Time.deltaTime;
+                yVelocity += gravity * gravityModifier * (fallingModifier - 1f) * Time.deltaTime;
             }
         }
         else

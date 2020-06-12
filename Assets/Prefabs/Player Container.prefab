@@ -637,7 +637,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973688975198}
-  m_LocalRotation: {x: 0.08825151, y: 0.000000017452583, z: 8.6675217e-10, w: 0.9960983}
+  m_LocalRotation: {x: 0.0882515, y: 0.000000017434424, z: 0.0000000010568728, w: 0.9960983}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -824,16 +824,19 @@ MonoBehaviour:
   movespeed: 1000
   moveDampTime: 0.1
   rotateRate: 4
+  horizontalRotateRate: 0.15
   gravity: -20
   jumpHeigth: 10
   lowJumpModifier: 1.5
   fallingModifier: 2
   wallJumpForce: {x: 100, y: 200}
   wallJumpForceDuration: 0.5
+  maxGravStep: 0.5
   weaponPrefab: {fileID: 0}
   weaponPoint: {fileID: 0}
   onGround: 0
   onWall: 0
+  gravityModifier: 1
 --- !u!1 &6919371973749572232
 GameObject:
   m_ObjectHideFlags: 0
@@ -858,7 +861,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6919371973749572232}
-  m_LocalRotation: {x: 0.06806786, y: 0.00000001921663, z: -0.0000000016632821, w: 0.9976807}
+  m_LocalRotation: {x: 0.06806786, y: 0.000000019211125, z: -0.0000000015794546, w: 0.9976807}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1077,17 +1080,20 @@ MonoBehaviour:
   movespeed: 1000
   moveDampTime: 0.1
   rotateRate: 2
+  horizontalRotateRate: 0.15
   gravity: -60
   jumpHeigth: 4
   lowJumpModifier: 3
   fallingModifier: 2
-  wallJumpForce: {x: 2400, y: 3000}
+  wallJumpForce: {x: 2000, y: 2000}
   wallJumpForceDuration: 0.5
+  maxGravStep: 0.5
   weaponPrefab: {fileID: 717432180930334250, guid: 17a4732b6d3e6774bafac478462849d5,
     type: 3}
   weaponPoint: {fileID: 2037081489905636407}
   onGround: 1
   onWall: 0
+  gravityModifier: 1
 --- !u!1001 &6919371973530684757
 PrefabInstance:
   m_ObjectHideFlags: 0

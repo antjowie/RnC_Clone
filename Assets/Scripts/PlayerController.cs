@@ -11,24 +11,38 @@ public class PlayerController : MonoBehaviour
     [Header("Camera")]
     public Transform cameraPoint;
     public CinemachineFreeLook playerCamera;
+    bool cameraYShouldMove = false;
+    float camYOffset = 0f;
 
     [Header("Movement")]
     public float movespeed = 1000f;
     public float moveDampTime = 0.1f;
     public float rotateRate = 4f;
     public float horizontalRotateRate = 0.15f;
+    Vector2 input;
+    Quaternion camRot;
+    Vector3 desVel;
+    Vector3 extVel;
 
     [Header("Jumping")]
     public float gravity = -20f;
     public float jumpHeigth = 10f;
     public float lowJumpModifier = 1.5f;
     public float fallingModifier = 2f;
+    // At the moment will only be used for player walljumping
+    bool jumpingPressed = false;
+    bool jumpingDown = false;
 
     [Header("Walljump")]
     public Vector2 wallJumpForce = new Vector2(100f,200f);
     public float wallJumpForceDuration = 0.5f;
     public float maxGravStep = 1f;
+    public float gravityModifier = 1f;
     Vector3 lastWallNormal;
+    float yVelocity = 0f;
+    bool isWalljumping = false;
+    float xRecTarget;
+    Cinemachine.AxisState.Recentering xRec;
 
     [Header("Combat")]
     public GameObject weaponPrefab;
@@ -41,20 +55,6 @@ public class PlayerController : MonoBehaviour
     // Components
     Rigidbody rb;
     Animator anim;
-
-    // Movement
-    Vector2 input;
-    Quaternion camRot;
-    Vector3 desVel;
-    Vector3 extVel;
-
-    // At the moment will only be used for player walljumping
-    public float gravityModifier = 1f;
-    float yVelocity = 0f;
-    bool jumpingPressed = false;
-    bool jumpingDown = false;
-
-    bool cameraYShouldMove = false;
 
     struct Force
     {
@@ -93,6 +93,15 @@ public class PlayerController : MonoBehaviour
         weaponPrefab = Instantiate(weaponPrefab, weaponPoint);
         weaponPrefab.transform.localPosition = Vector3.zero;
         weaponPrefab.transform.localScale = Vector3.one;
+
+        xRec = new AxisState.Recentering(true, 0f, 0.2f);
+    }
+
+    private void Start()
+    {
+        // For walljumping purposes. TODO: This breaks controller behavior maybe
+        playerCamera.m_YAxisRecentering.m_RecenteringTime = 0.2f;
+        //playerCamera.m_RecenterToTargetHeading.m_RecenteringTime = 0.2f;
     }
 
     private void Update()
@@ -125,10 +134,11 @@ public class PlayerController : MonoBehaviour
             gravityModifier += (gravStep * Time.deltaTime);
         }
 
+        UpdateWalljumping();
         UpdateWalkingOrientation();
         UpdateWeapon();
         UpdateAnimation();
-        UpdateCamera();
+        UpdateCameraY();
     }
 
     private void FixedUpdate()
@@ -218,19 +228,19 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    // Updates the camera Y pos
-    void UpdateCamera()
+    float curCamYVel = 0f;
+    void UpdateCameraY()
     {
-        if (transform.position.y < cameraPoint.transform.position.y)
-        {
-            cameraYShouldMove = true;
-        }
-        var camTargetPos = rb.transform.position;
+        var camTargetPos = rb.position;
         camTargetPos.y = cameraPoint.position.y;
+
+        if (camTargetPos.y > rb.position.y)
+            cameraYShouldMove = true;
 
         if (cameraYShouldMove)
         {
-            camTargetPos.y = Mathf.Lerp(camTargetPos.y, rb.transform.position.y, Time.deltaTime * 20f);
+            camTargetPos.y = Mathf.SmoothDamp(camTargetPos.y, rb.transform.position.y + camYOffset, ref curCamYVel, 0.2f);
+            //camTargetPos.y = Mathf.Lerp(camTargetPos.y, rb.transform.position.y + camYOffset, Time.deltaTime * 20f);
         }
 
         cameraPoint.transform.position = camTargetPos;
@@ -242,17 +252,23 @@ public class PlayerController : MonoBehaviour
         {
             //https://www.youtube.com/watch?v=v1V3T5BPd7E&list=PLFt_AvWsXl0eMryeweK7gc9T04lJCIg_W
             yVelocity = Mathf.Sqrt(-2 * gravity * jumpHeigth);
+
+            cameraYShouldMove = false;
         }
 
         // Walljump
         if(jumpingDown && !onGround && onWall)
         {
+            // If this is our first walljump
+            if (!isWalljumping)
+                SetIsWalljumping(true);
+
+            // Walljump response
             Vector3 force = lastWallNormal * wallJumpForce.x;
             force.y = wallJumpForce.y;
             ApplyForce(force, wallJumpForceDuration,true);
             gravityModifier = 0.5f;
             yVelocity = 0;
-            cameraYShouldMove = true;
         }
     }
 
@@ -303,13 +319,18 @@ public class PlayerController : MonoBehaviour
         foreach (var contact in contacts)
         {
             float dot = Vector3.Dot(contact.normal, rb.transform.up);
-            if (dot > 0.5f)
+            // Ground hit
+            if (dot > 0.5f && !onGround)
             {
                 onGround = true;
                 cameraYShouldMove = true;
+                camYOffset = 0;
+
+                SetIsWalljumping(false);
             }
 
-            if(dot > -0.1f && dot < 0.1f)
+            // Wall hit
+            if (dot > -0.1f && dot < 0.1f)
             {
                 lastWallNormal = contact.normal;
                 onWall = true;
@@ -323,7 +344,6 @@ public class PlayerController : MonoBehaviour
         // OnCollisionExit does not contain normal data
         onGround = false;
         onWall = false;
-        cameraYShouldMove = false;
 
         //var contacts = new ContactPoint[collision.contactCount];
         //collision.GetContacts(contacts);
@@ -331,5 +351,49 @@ public class PlayerController : MonoBehaviour
         //{
         //    Debug.DrawRay(contact.point, contact.normal * 10f, Color.blue,5f);
         //}
+    }
+
+    void SetIsWalljumping(bool value)
+    {
+        isWalljumping = value;
+        if (value)
+        {
+            cameraYShouldMove = true;
+            camYOffset = 1f;
+            playerCamera.m_YAxisRecentering.m_enabled = true;
+            //playerCamera.m_RecenterToTargetHeading.m_enabled = true;
+
+            // -- Calculate heading rotation
+            // The first part of the euqation reverses the direction of the tangent calculation
+            // Since the definition of tangent is a ccw rotation starting from the right
+            // Then, since our initial dir does not align with the tangent dir (negative vertical versus positive horizontal)
+            // we do a negative rotation of 90 degrees on the final result to make them match (-90 in a clockwise direction makes 
+            // negative vertical go to positive horizontal)
+            xRecTarget = 360f - Mathf.Rad2Deg * Mathf.Atan2(lastWallNormal.z, lastWallNormal.x) - 90f;
+
+            // Offset target rotation to be towards the old player direction
+            float dot = Vector3.Dot(lastWallNormal, camRot * Vector3.right);
+            xRecTarget += (dot / Mathf.Abs(dot)) * 90f;
+            Invoke("SetIswalljumpingFalse", xRec.m_RecenteringTime);
+        }
+        else
+        {
+            playerCamera.m_YAxisRecentering.m_enabled = false;
+            //playerCamera.m_RecenterToTargetHeading.m_enabled = false;
+        }
+    }
+
+    // Used by invoke to stop camera x centering after centring is done
+    void SetIswalljumpingFalse()
+    {
+        isWalljumping = false;
+    }
+
+    void UpdateWalljumping()
+    {
+        if (isWalljumping)
+        {
+            xRec.DoRecentering(ref playerCamera.m_XAxis, Time.deltaTime, xRecTarget);
+        }
     }
 }

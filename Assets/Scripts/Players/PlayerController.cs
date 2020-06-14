@@ -30,11 +30,6 @@ public class PlayerController : MonoBehaviour
     public float jumpHeigth = 10f;
     public float lowJumpModifier = 1.5f;
     public float fallingModifier = 2f;
-    // At the moment will only be used for player walljumping
-    KeyAction jumping;
-
-    //bool jumpingPressed = false;
-    //bool jumpingDown = false;
 
     [Header("Walljump")]
     public Vector2 wallJumpForce = new Vector2(100f,200f);
@@ -51,7 +46,6 @@ public class PlayerController : MonoBehaviour
     public GameObject weaponPrefab;
     public Transform weaponPoint;
     bool isWeaponStocked = true;
-    KeyAction weaponKeyAction;
     IWeapon weaponBehavior;
 
     [Header("READ ONLY Inpsectables")]
@@ -61,6 +55,10 @@ public class PlayerController : MonoBehaviour
     // Components
     Rigidbody rb;
     Animator anim;
+
+    // Input
+    InputAction weaponKeyAction = new InputAction();
+    InputAction jumping = new InputAction();
 
     struct Force
     {
@@ -101,8 +99,6 @@ public class PlayerController : MonoBehaviour
         weaponBehavior.playerOrientation = transform.gameObject;
 
         xRec = new AxisState.Recentering(true, 0f, 0.2f);
-        jumping = new KeyAction("Jump");
-        weaponKeyAction = new KeyAction("Fire1");
     }
 
     private void Start()
@@ -115,8 +111,8 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         // Update key actions
-        jumping.Update();
-        weaponKeyAction.Update();
+        jumping.Update("Jump");
+        weaponKeyAction.Update("Fire1");
 
         // Calculate movement input
         input.x = Input.GetAxisRaw("Horizontal");
@@ -169,7 +165,6 @@ public class PlayerController : MonoBehaviour
 
         rb.velocity = desVel + extVel;
     }
-
 
     void UpdateWalkingOrientation()
     {

@@ -30,8 +30,10 @@ public class PlayerController : MonoBehaviour
     public float lowJumpModifier = 1.5f;
     public float fallingModifier = 2f;
     // At the moment will only be used for player walljumping
-    bool jumpingPressed = false;
-    bool jumpingDown = false;
+    KeyAction jumping;
+
+    //bool jumpingPressed = false;
+    //bool jumpingDown = false;
 
     [Header("Walljump")]
     public Vector2 wallJumpForce = new Vector2(100f,200f);
@@ -91,10 +93,9 @@ public class PlayerController : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
 
         weaponPrefab = Instantiate(weaponPrefab, weaponPoint);
-        weaponPrefab.transform.localPosition = Vector3.zero;
-        weaponPrefab.transform.localScale = Vector3.one;
 
         xRec = new AxisState.Recentering(true, 0f, 0.2f);
+        jumping = new KeyAction("Jump");
     }
 
     private void Start()
@@ -111,14 +112,8 @@ public class PlayerController : MonoBehaviour
         input.y = Input.GetAxisRaw("Vertical");
         input.Normalize();
 
-        // Calculate if player pressed jump once
-        bool oldState = jumpingPressed;
-        jumpingDown = false;
-        jumpingPressed = Input.GetAxisRaw("Jump") == 1;
-        if (jumpingPressed && !oldState)
-            jumpingDown = true;
-
-        if (jumpingDown)
+        jumping.Update();
+        if (jumping.Down())
             OnJump();
 
         // Update camRot
@@ -226,6 +221,7 @@ public class PlayerController : MonoBehaviour
         }
         anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), blendWeigth);
 
+        //Input.ge
     }
 
     float curCamYVel = 0f;
@@ -248,7 +244,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump()
     {
-        if(jumpingDown && onGround)
+        if(jumping.Down() && onGround)
         {
             //https://www.youtube.com/watch?v=v1V3T5BPd7E&list=PLFt_AvWsXl0eMryeweK7gc9T04lJCIg_W
             yVelocity = Mathf.Sqrt(-2 * gravity * jumpHeigth);
@@ -257,7 +253,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Walljump
-        if(jumpingDown && !onGround && onWall)
+        if(jumping.Down() && !onGround && onWall)
         {
             // If this is our first walljump
             if (!isWalljumping)
@@ -283,7 +279,7 @@ public class PlayerController : MonoBehaviour
 
             if(!falling)
             {
-                if (!jumpingPressed)
+                if (!jumping)
                     yVelocity += gravity * gravityModifier * (lowJumpModifier - 1f) * Time.deltaTime;
             }
             else

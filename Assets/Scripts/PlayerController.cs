@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     Quaternion camRot;
     Vector3 desVel;
     Vector3 extVel;
+    bool strafing = false;
 
     [Header("Jumping")]
     public float gravity = -20f;
@@ -148,6 +149,7 @@ public class PlayerController : MonoBehaviour
 
         // Rotate camera based on horizontal movement relative to camera
         // We rotate it before setting the velocity since we rely on Unity physics for collisions.
+        if(!strafing)
         {
             var horizontal = (Quaternion.Inverse(camRot) * rb.velocity).x;// (Quaternion.Inverse(playerCamera.transform.rotation) * rb.velocity).x;
             horizontal = horizontal / (movespeed * Time.deltaTime);
@@ -162,15 +164,27 @@ public class PlayerController : MonoBehaviour
 
     void UpdateWalkingOrientation()
     {
-        // Update rotation
-        var desMove = desVel; desMove.y = 0;
-        // We only rotate if we move
-        if (desMove != Vector3.zero)
+        if(strafing)
         {
+            // Rotate towards camera dir
             rb.rotation = Quaternion.RotateTowards(
-                rb.rotation, 
-                Quaternion.LookRotation(desMove.normalized, Vector3.up), 
+                rb.rotation,
+                camRot,
                 360f * rotateRate * Time.deltaTime);
+
+        }
+        else
+        {
+            // Update rotation
+            var desMove = desVel; desMove.y = 0;
+            // We only rotate if we move
+            if (desMove != Vector3.zero)
+            {
+                rb.rotation = Quaternion.RotateTowards(
+                    rb.rotation, 
+                    Quaternion.LookRotation(desMove.normalized, Vector3.up), 
+                    360f * rotateRate * Time.deltaTime);
+            }
         }
     }
 
@@ -185,8 +199,19 @@ public class PlayerController : MonoBehaviour
 
         var desMove = desVel; desMove.y = 0;
         var dot = Vector3.Dot(rb.rotation * Vector3.forward, desMove.normalized);
-        anim.SetFloat("Vertical", movement.magnitude * Mathf.CeilToInt(dot), moveDampTime, Time.deltaTime);
         anim.SetBool("OnGround", onGround);
+
+        strafing = Input.GetAxisRaw("Strafe") == 1;
+        anim.SetBool("Strafing", strafing);
+        if(strafing)
+        {
+            anim.SetFloat("Vertical", input.y, moveDampTime, Time.deltaTime);
+            anim.SetFloat("Horizontal", input.x, moveDampTime, Time.deltaTime);
+        }
+        else
+        {
+            anim.SetFloat("Vertical", movement.magnitude * Mathf.CeilToInt(dot), moveDampTime, Time.deltaTime);
+        }
     }
 
     // This function calculates the velocity that a force applies
@@ -220,8 +245,6 @@ public class PlayerController : MonoBehaviour
             blendWeigth = Mathf.Lerp(blendWeigth, 0f, Time.deltaTime / blendTime);
         }
         anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), blendWeigth);
-
-        //Input.ge
     }
 
     float curCamYVel = 0f;

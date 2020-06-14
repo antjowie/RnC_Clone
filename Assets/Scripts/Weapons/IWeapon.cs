@@ -2,24 +2,30 @@
 
 public abstract class IWeapon : MonoBehaviour
 {
-    // Variables used in all weapons
-    internal Vector3 shootDir;
+    public GameObject playerOrientation;
     Camera cam;
 
-    internal virtual void OnShoot() { }
-    internal virtual void OnShootDown() { }
-    internal virtual void OnShootRelease() { }
+    // Variables used in all weapons
+    protected Vector3 lookDir;
+    protected Vector3 playerDir;
+
+    protected virtual void OnShoot() { }
+    protected virtual void OnShootDown() { }
+    protected virtual void OnShootRelease() { }
 
     public void Shoot()
     {
+        CalculateVariables();
         OnShoot();
     }
     public void ShootDown()
     {
+        CalculateVariables();
         OnShootDown();
     }
     public void ShootRelease()
     {
+        CalculateVariables();
         OnShootRelease();
     }
 
@@ -28,8 +34,9 @@ public abstract class IWeapon : MonoBehaviour
         cam = Camera.main;
     }
 
-    public void Update()
+    void CalculateVariables()
     {
-        shootDir = cam.transform.forward;
+        lookDir = cam.transform.forward;
+        playerDir = playerOrientation.transform.forward;
     }
 }

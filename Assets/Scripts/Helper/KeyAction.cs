@@ -6,7 +6,7 @@ public class KeyAction
     {
         Released,
         Down,
-        Hold,
+        Held,
         Up,
     };
 
@@ -21,12 +21,12 @@ public class KeyAction
     // Returns true if action is pressed
     public static implicit operator bool(KeyAction action)
     {
-        return action.state == AxisState.Down || action.state == AxisState.Hold;
+        return action.state == AxisState.Down || action.state == AxisState.Held;
     }
 
     public bool Released() => state == AxisState.Released;
     public bool Down() => state == AxisState.Down;
-    public bool Hold() => state == AxisState.Hold;
+    public bool Held() => state == AxisState.Held;
     public bool Up() => state == AxisState.Up;
 
     public void Update()
@@ -41,11 +41,11 @@ public class KeyAction
                 break;
             case AxisState.Down:
                 if (isHold)
-                    state = AxisState.Hold;
+                    state = AxisState.Held;
                 else
                     state = AxisState.Up;
                 break;
-            case AxisState.Hold:
+            case AxisState.Held:
                 if (!isHold)
                     state = AxisState.Up;
                 break;

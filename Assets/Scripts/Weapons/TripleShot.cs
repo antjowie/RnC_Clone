@@ -5,8 +5,28 @@ public class TripleShot : IWeapon
     public GameObject projectile;
     public GameObject shootOrigin;
 
-    internal override void OnShoot()
+    protected override void OnShoot()
     {
-        
+        //var proj = Instantiate(projectile);
+
+        // temp
+        var obj = Instantiate(projectile, shootOrigin.transform.position, shootOrigin.transform.rotation);
+
+        var rb = obj.AddComponent<Rigidbody>();
+
+        rb.useGravity = false;
+        rb.drag = 0f;
+        rb.angularDrag = 0f;
+        rb.angularVelocity = new Vector3(Mathf.PI * 2f, Mathf.PI * 4f, Mathf.PI);
+
+        var shootDir = playerDir;
+        shootDir.y = 0;
+
+        rb.velocity = shootDir.normalized * 20f;
+        rb.WakeUp();
+
+        print(lookDir.normalized);
+
+        Destroy(obj, 5f);
     }
 }

@@ -50,6 +50,9 @@ public class PlayerController : MonoBehaviour
     [Header("Combat")]
     public GameObject weaponPrefab;
     public Transform weaponPoint;
+    bool isWeaponStocked = true;
+    KeyAction weaponKeyAction;
+    IWeapon weaponBehavior;
 
     [Header("READ ONLY Inpsectables")]
     public bool onGround = true;
@@ -69,7 +72,7 @@ public class PlayerController : MonoBehaviour
     Force extForce;
 
     // Animations
-    float blendWeigth = 0f;
+    float weaponBlendWeigth = 0f;
     float blendTime = 0.2f;
 
     public void ApplyForce(Vector3 force, float cancelTime, bool desired = false)
@@ -94,9 +97,12 @@ public class PlayerController : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
 
         weaponPrefab = Instantiate(weaponPrefab, weaponPoint);
+        weaponBehavior = weaponPrefab.GetComponent<IWeapon>();
+        weaponBehavior.playerOrientation = transform.gameObject;
 
         xRec = new AxisState.Recentering(true, 0f, 0.2f);
         jumping = new KeyAction("Jump");
+        weaponKeyAction = new KeyAction("Fire1");
     }
 
     private void Start()
@@ -108,12 +114,15 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // Update key actions
+        jumping.Update();
+        weaponKeyAction.Update();
+
         // Calculate movement input
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
         input.Normalize();
 
-        jumping.Update();
         if (jumping.Down())
             OnJump();
 
@@ -234,17 +243,27 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateWeapon()
     {
-        if (Input.GetMouseButton((int)MouseButton.RightMouse))
+        // TODO: Add some kind of timer here or whatever makes sense
+        // RnC does it that when u use ur melee weapon will be stocked be we have no melee yet
+        isWeaponStocked = !weaponKeyAction;
+
+        // Show or hide weapon
+        if (!isWeaponStocked)
         {
             weaponPrefab.SetActive(true);
-            blendWeigth = Mathf.Lerp(blendWeigth, 1.0f, Time.deltaTime / blendTime);
+            weaponBlendWeigth = Mathf.Lerp(weaponBlendWeigth, 1.0f, Time.deltaTime / blendTime);
         }
-        else
+        else 
         {
             weaponPrefab.SetActive(false);
-            blendWeigth = Mathf.Lerp(blendWeigth, 0f, Time.deltaTime / blendTime);
+            weaponBlendWeigth = Mathf.Lerp(weaponBlendWeigth, 0f, Time.deltaTime / blendTime);
         }
-        anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), blendWeigth);
+        anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), weaponBlendWeigth);
+
+        // Fire behavior
+        if (weaponKeyAction.Down()) weaponBehavior.ShootDown();
+        if (weaponKeyAction.Held()) weaponBehavior.Shoot();
+        if (weaponKeyAction.Released()) weaponBehavior.ShootRelease();
     }
 
     float curCamYVel = 0f;
@@ -259,7 +278,6 @@ public class PlayerController : MonoBehaviour
         if (cameraYShouldMove)
         {
             camTargetPos.y = Mathf.SmoothDamp(camTargetPos.y, rb.transform.position.y + camYOffset, ref curCamYVel, 0.2f);
-            //camTargetPos.y = Mathf.Lerp(camTargetPos.y, rb.transform.position.y + camYOffset, Time.deltaTime * 20f);
         }
 
         cameraPoint.transform.position = camTargetPos;

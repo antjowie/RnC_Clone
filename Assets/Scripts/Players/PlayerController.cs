@@ -46,7 +46,9 @@ public class PlayerController : MonoBehaviour
     public GameObject weaponPrefab;
     public Transform weaponPoint;
     bool isWeaponStocked = true;
-    IWeapon weaponBehavior;
+    
+    // Weapon is set in weaponSelect
+    public IWeapon weaponBehavior;
 
     [Header("READ ONLY Inpsectables")]
     public bool onGround = true;

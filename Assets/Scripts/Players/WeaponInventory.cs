@@ -17,12 +17,12 @@ public class WeaponInventory : MonoBehaviour
 
     public Item[] items;
 
-    GameObject GetWeapon(int index)
+    public GameObject GetWeapon(int index)
     {
         return items[index].weaponPrefab;
     }
 
-    void SetWeapon(int index, GameObject weapon, string name = "")
+    public void SetWeapon(int index, GameObject weapon, string name = "")
     {
         items[index].weaponPrefab = weapon;
         if (name.Length == 0)
@@ -30,15 +30,11 @@ public class WeaponInventory : MonoBehaviour
         items[index].text.text = name;
     }
 
-    // Start is called before the first frame update
-    void Awake()
+    private void Awake()
     {
-        // TODO: This doesn't take name into consideration
-        for (int i = 0; i < items.Length; i++)
+        foreach(Item item in items)
         {
-            items[i].text = items[i].slot.GetComponentInChildren<Text>();
-            if (items[i].weaponPrefab)
-                SetWeapon(i, items[i].weaponPrefab);
+            item.text = item.slot.GetComponentInChildren<Text>();
         }
     }
 }

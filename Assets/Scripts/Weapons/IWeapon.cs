@@ -29,7 +29,7 @@ public abstract class IWeapon : MonoBehaviour
         OnShootRelease();
     }
 
-    public void Start()
+    public void Awake()
     {
         cam = Camera.main;
     }

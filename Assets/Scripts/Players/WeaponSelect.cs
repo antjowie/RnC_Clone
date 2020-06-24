@@ -15,6 +15,8 @@ public class WeaponSelect : MonoBehaviour
     string origX;
     string origY;
 
+    Vector2 dir;
+
     InputAction inventoryAction = new InputAction();
 
     // Start is called before the first frame update
@@ -33,6 +35,11 @@ public class WeaponSelect : MonoBehaviour
             if (items[i].weaponPrefab)
                 inventory.SetWeapon(i, items[i].weaponPrefab, string.Format("triple shot {0}",i));
         }
+    }
+
+    void ResetDir()
+    {
+        dir = Vector2.zero;
     }
 
     // Update is called once per frame
@@ -57,6 +64,7 @@ public class WeaponSelect : MonoBehaviour
 
             playerCam.m_XAxis.m_InputAxisName = origX;
             playerCam.m_YAxis.m_InputAxisName = origY;
+            ResetDir();
 
             toCreate = inventory.GetWeapon(inventory.hovered);
         }
@@ -64,17 +72,24 @@ public class WeaponSelect : MonoBehaviour
         if(inventoryAction)
         {
             // Calculate angle [0,360] to select weapons and convert it to weapon slot
-            var dir = new Vector2(Input.GetAxis(origX), Input.GetAxis(origY)).normalized;
+            var move = new Vector2(Input.GetAxis(origX), Input.GetAxis(origY));
                         
             int slotCount = inventory.items.Length;
             float slotAngle = 360f / slotCount;
-            if(dir.magnitude != 0f)
+
+            Invoke("ResetDir", 0.01f);
+            //ResetDir();
+            if (move.magnitude != 0f)
             {
+                CancelInvoke("ResetDir");
+                dir += move;
+
                 // We should probably offset the angle but I will polish this in the future
-                var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;// + slotAngle / 2f;
+                var normal = dir.normalized;
+                var angle = Mathf.Atan2(normal.y, normal.x) * Mathf.Rad2Deg - 90f - slotAngle / 2f;
                 if (angle < 0f) angle += 360f;
                 angle = 360f - angle;
-                //print(angle);
+                print(angle);
 
                 for (int i = 0; i < slotCount; i++)
                 {

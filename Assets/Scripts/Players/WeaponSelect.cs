@@ -89,7 +89,7 @@ public class WeaponSelect : MonoBehaviour
                 var angle = Mathf.Atan2(normal.y, normal.x) * Mathf.Rad2Deg - 90f - slotAngle / 2f;
                 if (angle < 0f) angle += 360f;
                 angle = 360f - angle;
-                print(angle);
+                //print(angle);
 
                 for (int i = 0; i < slotCount; i++)
                 {

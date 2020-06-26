@@ -65,4 +65,10 @@ public class Health : MonoBehaviour
             Damage(1);
         }        
     }
+
+    private void OnParticleCollision(GameObject other)
+    {
+        Damage(1);
+    }
 }
+

@@ -39,7 +39,6 @@ public class WeaponInventory : MonoBehaviour
 
     IEnumerator FadeIn()
     {
-        print(group.alpha);
         while(group.alpha < 1f)
         {
             group.alpha = Mathf.Min(1f, group.alpha + Time.deltaTime / fadeTime);

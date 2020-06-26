@@ -27,4 +27,9 @@ public class Flamethrower : IWeapon
     {
         particleSystem.Stop();
     }
+
+    private void OnParticleTrigger()
+    {
+        print("OOF2");
+    }
 }

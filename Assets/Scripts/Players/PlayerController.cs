@@ -250,12 +250,12 @@ public class PlayerController : MonoBehaviour
         // Show or hide weapon
         if (!isWeaponStocked)
         {
-            weaponPrefab.SetActive(true);
+            //weaponPrefab.SetActive(true);
             weaponBlendWeigth = Mathf.Lerp(weaponBlendWeigth, 1.0f, Time.deltaTime / blendTime);
         }
         else 
         {
-            weaponPrefab.SetActive(false);
+            //weaponPrefab.SetActive(false);
             weaponBlendWeigth = Mathf.Lerp(weaponBlendWeigth, 0f, Time.deltaTime / blendTime);
         }
         //anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), weaponBlendWeigth);

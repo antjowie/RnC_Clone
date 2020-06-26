@@ -3,6 +3,7 @@
 public abstract class IWeapon : MonoBehaviour
 {
     public GameObject playerOrientation;
+    public GameObject shootOrigin;
     Camera cam;
 
     // Variables used in all weapons
@@ -28,8 +29,8 @@ public abstract class IWeapon : MonoBehaviour
         CalculateVariables();
         OnShootRelease();
     }
-
-    public void Awake()
+    
+    public void OnEnable()
     {
         cam = Camera.main;
     }

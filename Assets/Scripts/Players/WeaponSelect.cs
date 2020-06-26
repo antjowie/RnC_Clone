@@ -33,7 +33,7 @@ public class WeaponSelect : MonoBehaviour
         for (int i = 0; i < items.Length; i++)
         {
             if (items[i].weaponPrefab)
-                inventory.SetWeapon(i, items[i].weaponPrefab, string.Format("triple shot {0}",i));
+                inventory.SetWeapon(i, items[i].weaponPrefab);
         }
     }
 

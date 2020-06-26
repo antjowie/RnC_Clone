@@ -3,7 +3,9 @@ using Cinemachine.Utility;
 using System;
 using Unity.Collections;
 using UnityEditor;
+using UnityEditor.Animations.Rigging;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
@@ -43,6 +45,7 @@ public class PlayerController : MonoBehaviour
     Cinemachine.AxisState.Recentering xRec;
 
     [Header("Combat")]
+    public Rig aimRig;
     public GameObject weaponPrefab;
     public Transform weaponPoint;
     bool isWeaponStocked = true;
@@ -255,7 +258,8 @@ public class PlayerController : MonoBehaviour
             weaponPrefab.SetActive(false);
             weaponBlendWeigth = Mathf.Lerp(weaponBlendWeigth, 0f, Time.deltaTime / blendTime);
         }
-        anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), weaponBlendWeigth);
+        //anim.SetLayerWeight(anim.GetLayerIndex("Weapon"), weaponBlendWeigth);
+        aimRig.weight = weaponBlendWeigth;
 
         // Fire behavior
         if (weaponKeyAction.Down()) weaponBehavior.ShootDown();
